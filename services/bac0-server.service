@@ -1,0 +1,13 @@
+[Unit]
+Description=BAC0 Internal API server
+Wants=network-online.target
+After=network.target
+
+[Service]
+ExecStart=/home/pi/bacnet_iot/BAC0_server/python34/bin/python bac0_app.py
+WorkingDirectory=/home/pi/bacnet_iot/BAC0_server
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

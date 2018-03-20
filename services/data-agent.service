@@ -1,0 +1,13 @@
+[Unit]
+Description=Imageous data agent
+Wants=network-online.target
+After=network.target bac0-server.service
+
+[Service]
+ExecStart=/usr/bin/python data_agent.py
+WorkingDirectory=/home/pi/bacnet_iot/data_agent
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

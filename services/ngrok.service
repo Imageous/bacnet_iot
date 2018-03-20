@@ -1,0 +1,14 @@
+[Unit]
+Description=Ngrok service
+Wants=network-online.target
+After=network.target
+
+[Service]
+ExecStart=/home/pi/bacnet_iot/ngrok tcp 22
+WorkingDirectory=/home/pi/bacnet_iot
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
