@@ -16,6 +16,20 @@ def get_ngrok_url():
 		time.sleep(5)
                 get_ngrok_url(logfile)
 
+def get_serial():
+    # Extract serial from cpuinfo file
+    cpuserial = "0000000000000000"
+    try:
+        f = open('/proc/cpuinfo','r')
+        for line in f:
+            if line[0:6]=='Serial':
+                cpuserial = line[10:26]
+        f.close()
+    except:
+        cpuserial = "ERROR000000000"
+
+    return cpuserial
+
 #with open('ngrok.out.txt', 'w') as f:
 #	subprocess.call(['/home/pi/ngrok', 'tcp', '22'], stdout=f)
 
@@ -24,18 +38,18 @@ logging.warning(url)
 
 result = requests.post(
             "https://api.mailgun.net/v3/imageous.io/messages",
-            auth=("api", "key-9f9feb3fc05b6bf638c39ce54f974ec2"),
+            auth=("api", "key-f7371ec0910d2c9b2e99e83a1f496e44"),
             data={"from": "Roby <roby@imageous.io>",
                     "to": ['justin@imageous-inc.com', 'justin@imageous-inc.com'],
                     "subject": "New ngrok connection for raspi",
-                    "text": url})
+                    "text": url + '\nDevice: ' + get_serial()})
 result = requests.post(
             "https://api.mailgun.net/v3/imageous.io/messages",
-            auth=("api", "key-9f9feb3fc05b6bf638c39ce54f974ec2"),
+            auth=("api", "key-f7371ec0910d2c9b2e99e83a1f496e44"),
             data={"from": "Roby <roby@imageous.io>",
                     "to": ['ben@imageous-inc.com', 'ben@imageous-inc.com'],
                     "subject": "New ngrok connection for raspi",
-                    "text": url})
+                    "text": url + '\nDevice: ' + get_serial()})
 
 while(1):
     time.sleep(10000)

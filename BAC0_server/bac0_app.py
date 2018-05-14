@@ -28,7 +28,7 @@ try:
 	print("Discovered %s on eth1 for BACnet IP, connected" % eth1_ip)
 except:
 	logging.warning("Available interfaces: %s" % ni.interfaces())
-	logging.warning("Exception occured: %s \n Failed to read IP address on eth0, defaulting to static IP setting: %s" % (sys.exc_info(), STATIC_BACNET_IP))
+	logging.warning("Exception occured: %s \n Failed to read IP address on eth0, defaulting to static IP setting: %s" % (str(sys.exc_info()), STATIC_BACNET_IP))
 	print("Establishing BACnet connection on: %s" % STATIC_BACNET_IP)
 	bacnet = BAC0.connect(ip=STATIC_BACNET_IP)
 #bacnet.whois()
@@ -73,14 +73,14 @@ def create_server(app):
 			object_type = request.form['object_type']
 		except:
 			err_msg = "Read request was missing a required parameter. Required: [device_id, object_id, object_type]"
-			logging.warning(err_msg + " Exception: " + sys.exc_info())
+			logging.warning(err_msg + " Exception: " + str(sys.exc_info()))
 			return jsonify({"status_code": 500, "description": err_msg})
 
 		# get address of target device
 		try:
 			target_address = get_address(int(device_id))
 		except:
-			logging.warning("Exception: " + sys.exc_info())
+			logging.warning("Exception: " + str(sys.exc_info()))
 			return jsonify({"status_code": 500, "description": "Searching for device on network encountered exception"})
 		if target_address is None:
 			err_msg = "Address was not found for device %s" % device_id
@@ -92,8 +92,15 @@ def create_server(app):
 		logging.warning("Excecuting BACpypes statement: %s", bp_stmt)
 		try:
 			result = bacnet.read(bp_stmt)
+			nonflt = ["0", "1", "active", "inactive"]
+			if result not in nonflt:
+				try:
+					rounded = round(float(result), 1)
+				except:
+					logging.warning("Failed to convert "+result+" to float for rounding.")
+				result = rounded
 		except:
-			logging.warning("BACnet read failed. Exception: " + sys.exc_info())
+			logging.warning("BACnet read failed. Exception: " + str(sys.exc_info()))
 			return jsonify({"status_code": 500, "description": "BACnet read failed"})
 		return jsonify({"status_code": 200, "value": result})
 
@@ -114,7 +121,7 @@ def create_server(app):
 		try:
 			target_address = get_address(int(device_id))
 		except:
-			logging.warning("Exception: " + sys.exc_info())
+			logging.warning("Exception: " + str(sys.exc_info()))
 			return jsonify({"status_code": 500, "description": "Searching for device on network encountered exception"})
 		if target_address is None:
 			err_msg = "Address was not found for device %s" % device_id
@@ -128,7 +135,7 @@ def create_server(app):
 		try:
 			result = bacnet.write(bp_stmt)
 		except:
-			logging.warning("BACnet write failed. Exception: " + sys.exc_info())
+			logging.warning("BACnet write failed. Exception: " + str(sys.exc_info()))
 			return jsonify({"status_code": 500, "description": "BACnet write failed"})
 		return jsonify({"status_code": 200})
 
