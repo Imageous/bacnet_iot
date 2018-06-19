@@ -32,7 +32,7 @@ except:
 	print("Establishing BACnet connection on: %s" % STATIC_BACNET_IP)
 	bacnet = BAC0.connect(ip=STATIC_BACNET_IP)
 #bacnet.whois()
-time.sleep(2)
+#time.sleep(2)
 #print(bacnet.devices)
 
 #request_object_list = [('analogValue', 90)]
@@ -41,6 +41,16 @@ time.sleep(2)
 #print(device.points)
 #print(device['analogValue'])
 
+# cache a mapping of device_id to addresses for faster lookup
+devices = bacnet.whois()
+#print(bacnet.devices)
+time.sleep(2)
+device_mapping = {}
+for device in devices:
+	if isinstance(device, tuple):
+		device_mapping[device[1]] = device[0]
+		logging.info("Detected device %s with address %s" % (str(device[1]), str(device[0])))
+#print(device_mapping)
 
 app = Flask(__name__)
 
@@ -60,6 +70,11 @@ def get_address(device_id):
 		raise
 	return target_address
 
+def get_cached_address(device_id):
+	target_address = device_mapping[int(device_id)]
+	if target_address is None:
+		logging.warning("Failed to find a device mapping for device id: %s" % str(device_id))
+	return target_address
 
 # create endpoints
 def create_server(app):
@@ -78,7 +93,8 @@ def create_server(app):
 
 		# get address of target device
 		try:
-			target_address = get_address(int(device_id))
+			#target_address = get_address(int(device_id))
+			target_address = get_cached_address(int(device_id))
 		except:
 			logging.warning("Exception: " + str(sys.exc_info()))
 			return jsonify({"status_code": 500, "description": "Searching for device on network encountered exception"})
@@ -125,7 +141,7 @@ def create_server(app):
 			return jsonify({"status_code": 500, "description": "Searching for device on network encountered exception"})
 		if target_address is None:
 			err_msg = "Address was not found for device %s" % device_id
-			logging.warning()
+			logging.warning(err_msg)
 			return jsonify({"status_code": 500, "description": err_msg})
 			#raise Exception("Address was not found for device %s", device_id)
 
