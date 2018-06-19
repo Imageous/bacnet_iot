@@ -44,13 +44,14 @@ except:
 # cache a mapping of device_id to addresses for faster lookup
 devices = bacnet.whois()
 #print(bacnet.devices)
-time.sleep(2)
+time.sleep(5)
 device_mapping = {}
 for device in devices:
 	if isinstance(device, tuple):
 		device_mapping[device[1]] = device[0]
-		logging.info("Detected device %s with address %s" % (str(device[1]), str(device[0])))
+		logging.warning("Detected device %s with address %s" % (str(device[1]), str(device[0])))
 #print(device_mapping)
+logging.warning(str(len(device_mapping))+" devices discovered on network.")
 
 app = Flask(__name__)
 

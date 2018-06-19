@@ -43,13 +43,14 @@ result = requests.post(
                     "to": ['justin@imageous-inc.com', 'justin@imageous-inc.com'],
                     "subject": "New ngrok connection for raspi",
                     "text": url + '\nDevice: ' + get_serial()})
+
 #result = requests.post(
 #            "https://api.mailgun.net/v3/imageous.io/messages",
-#            auth=("api", "key-9f9feb3fc05b6bf638c39ce54f974ec2"),
+#            auth=("api", "key-f7371ec0910d2c9b2e99e83a1f496e44"),
 #            data={"from": "Roby <roby@imageous.io>",
 #                    "to": ['ben@imageous-inc.com', 'ben@imageous-inc.com'],
 #                    "subject": "New ngrok connection for raspi",
-#                    "text": url})
+#                    "text": url + '\nDevice: ' + get_serial()})
 
 while(1):
     time.sleep(10000)
